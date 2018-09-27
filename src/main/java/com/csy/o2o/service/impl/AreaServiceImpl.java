@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.csy.o2o.cache.JedisUtil;
 import com.csy.o2o.dao.AreaDao;
 import com.csy.o2o.entity.Area;
 import com.csy.o2o.exception.AreaOperationException;
@@ -27,12 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 	@Autowired
 	AreaDao areaDao;
 	
-	@Autowired
-	private JedisUtil.Keys jedisKeys;
-	
-	@Autowired
-	private JedisUtil.Strings jedisStrings;
-	
 	private Logger log = LoggerFactory.getLogger(AreaServiceImpl.class);
 	
 	@Transactional
@@ -40,36 +33,37 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 		String keys = AREALISTKEY;
 		List<Area> areaList = null;
 		ObjectMapper mapper = new ObjectMapper();
+		areaList = areaDao.queryArea();
 		//如果不存在key
-		if(!jedisKeys.exists(keys)){
-			areaList = areaDao.queryArea();
-			try {
-				String areaListStr = mapper.writeValueAsString(areaList);
-				jedisStrings.set(keys, areaListStr);
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-				log.error(e.getMessage());
-				throw new AreaOperationException(e.getMessage());
-			}
-		}else{
-			String jsonStr = jedisStrings.get(keys);
-			JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Area.class);
-			try {
-				areaList = mapper.readValue(jsonStr, javaType);
-			} catch (JsonParseException e) {
-				e.printStackTrace();
-				log.error(e.getMessage());
-				throw new AreaOperationException(e.getMessage());
-			} catch (JsonMappingException e) {
-				e.printStackTrace();
-				log.error(e.getMessage());
-				throw new AreaOperationException(e.getMessage());
-			} catch (IOException e) {
-				e.printStackTrace();
-				log.error(e.getMessage());
-				throw new AreaOperationException(e.getMessage());
-			}
-		}
+//		if(!jedisKeys.exists(keys)){
+//			areaList = areaDao.queryArea();
+//			try {
+//				String areaListStr = mapper.writeValueAsString(areaList);
+//				jedisStrings.set(keys, areaListStr);
+//			} catch (JsonProcessingException e) {
+//				e.printStackTrace();
+//				log.error(e.getMessage());
+//				throw new AreaOperationException(e.getMessage());
+//			}
+//		}else{
+//			String jsonStr = jedisStrings.get(keys);
+//			JavaType javaType = mapper.getTypeFactory().constructParametricType(ArrayList.class, Area.class);
+//			try {
+//				areaList = mapper.readValue(jsonStr, javaType);
+//			} catch (JsonParseException e) {
+//				e.printStackTrace();
+//				log.error(e.getMessage());
+//				throw new AreaOperationException(e.getMessage());
+//			} catch (JsonMappingException e) {
+//				e.printStackTrace();
+//				log.error(e.getMessage());
+//				throw new AreaOperationException(e.getMessage());
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//				log.error(e.getMessage());
+//				throw new AreaOperationException(e.getMessage());
+//			}
+//		}
 		return areaList;
 	}
 

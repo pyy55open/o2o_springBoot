@@ -21,6 +21,6 @@ public class AreaServiceTest{
 	@Test
 	public void testGetArea(){
 		List<Area> list = areaService.getArea();
-		assertEquals("问",list.get(0).getAreaname());
+		assertEquals("南京",list.get(0).getAreaname());
 	}
 }
